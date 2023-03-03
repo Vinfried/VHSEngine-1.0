@@ -3,10 +3,10 @@
 #include "VHSEngine/CoreMinimal.h"
 
 const PositionMatrix TrianglePositions{
-	//x		//y		//z		//R	  //G   //B		//tex coords
-	-0.5f,	-0.5f,	0.0f,	1.0f, 0.0f, 0.0f,	0.0f, 0.0f, //bottom left --- 0
-	 0.5f,	-0.5f,	0.0f,	0.0f, 1.0f, 0.0f,	1.0f, 0.0f, //bottom right --- 1
-	 0.0f,	 0.5f,	0.0f,	0.0f, 0.0f, 1.0f,	0.5f, 1.0f //top --- 2
+	//x		//y		//z		//R	  //G   //B	
+	-0.5f,	-0.5f,	0.0f,	1.0f, 0.0f, 0.0f, //bottom left --- 0
+	 0.5f,	-0.5f,	0.0f,	0.0f, 1.0f, 0.0f, //bottom right --- 1
+	 0.0f,	 0.5f,	0.0f,	0.0f, 0.0f, 1.0f//top --- 2
 };
 
 const IndicesMatrix TriangleIndices{
@@ -15,10 +15,10 @@ const IndicesMatrix TriangleIndices{
 
 const PositionMatrix PolyPositions{
 	//x		//y		//z		//R	  //G	//B		// tex coords
-	-0.5f,	-0.5f,	0.0f,	1.0f, 1.0f, 0.0f,	0.0f, 0.0f,	//bottom left --- 0
-	 0.5f,	-0.5f,	0.0f,	1.0f, 1.0f, 0.0f,	1.f, 0.0f, //bottom right --- 1
-	 0.5f,	 0.5f,	0.0f,	1.0f, 1.0f, 0.0f,	1.0f, 1.0f, //top right --- 2
-	-0.5f,	 0.5f,	0.0f,	1.0f, 1.0f, 0.0f,	0.0f, 1.0f //top left --- 3
+	-0.5f,	-0.5f,	0.0f,	1.0f, 1.0f, 0.0f,	//bottom left --- 0
+	 0.5f,	-0.5f,	0.0f,	1.0f, 1.0f, 0.0f, //bottom right --- 1
+	 0.5f,	 0.5f,	0.0f,	1.0f, 1.0f, 0.0f, //top right --- 2
+	-0.5f,	 0.5f,	0.0f,	1.0f, 1.0f, 0.0f //top left --- 3
 
 	};
 

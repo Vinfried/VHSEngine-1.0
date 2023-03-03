@@ -121,7 +121,7 @@ void GraphicsEngine::Draw()
 			transform = glm::translate(transform, glm::vec3(0.5f, 0.0, 0.0f));
 			//radians is rotating amount
 			//vec3 is the direction to rotate in
-			transform = glm::rotate(transform, glm::radians(0.5f), glm::vec3(0.0f, 0.0f, 1.0f));
+			transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		}
 		else if (index == 1) { //Triangle
