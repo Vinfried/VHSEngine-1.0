@@ -139,6 +139,7 @@
     <ClInclude Include="includes\VHSEngine\Graphics\GraphicsEngine.h" />
     <ClInclude Include="includes\VHSEngine\Graphics\ShaderProgram.h" />
     <ClInclude Include="includes\VHSEngine\Graphics\VertexArrayObject.h" />
+    <ClInclude Include="includes\VHSEngine\Graphics\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\Source.cpp" />
@@ -146,11 +147,14 @@
     <ClCompile Include="source\VHSEngine\Game.cpp" />
     <ClCompile Include="source\VHSEngine\Graphics\GraphicsEngine.cpp" />
     <ClCompile Include="source\VHSEngine\Graphics\ShaderProgram.cpp" />
+    <ClCompile Include="source\VHSEngine\Graphics\Texture.cpp" />
     <ClCompile Include="source\VHSEngine\Graphics\VertexArrayObject.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Game\Shaders\SimpleShader\SimpleShader.sfrag" />
-    <None Include="Game\Shaders\SimpleShader\SimpleShader.svert" />
+    <None Include="Game\Shaders\TextureShader\TextureShader.sfrag" />
+    <None Include="Game\Shaders\TextureShader\TextureShader.svert" />
+    <None Include="Game\Shaders\VertexShader\VertexShader.sfrag" />
+    <None Include="Game\Shaders\VertexShader\VertexShader.svert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

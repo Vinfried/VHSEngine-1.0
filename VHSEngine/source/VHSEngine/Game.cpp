@@ -1,4 +1,6 @@
 #include "VHSEngine/Game.h"
+#include "VHSEngine/Graphics/GraphicsEngine.h"
+#include "VHSEngine/Graphics/Texture.h"
 
 Game& Game::GetGameInstance()
 {
@@ -42,9 +44,12 @@ void Game::Run()
 	if (!bIsGameOver) {
 
 		Graphics->CreateShader({
-			L"Game/Shaders/SimpleShader/SimpleShader.svert",
-			L"Game/Shaders/SimpleShader/SimpleShader.sfrag"
+			L"Game/Shaders/TextureShader/TextureShader.svert",
+			L"Game/Shaders/TextureShader/TextureShader.sfrag"
 			});
+
+		Graphics->CreateTexture("Game/Textures/GreySquare_S.jpg");
+		Graphics->CreateTexture("Game/Textures/seamless-tech-texture.jpg")->BindTexture();
 
 		//create VAOS
 		Graphics->CreateVAO(GeometricShapes::Polygon);

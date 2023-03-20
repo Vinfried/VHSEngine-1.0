@@ -4,6 +4,7 @@
 #include "VHSEngine/Graphics/ShaderProgram.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "VHSEngine/Graphics/Texture.h"
 
 GraphicsEngine::GraphicsEngine()
 {
@@ -14,7 +15,8 @@ GraphicsEngine::GraphicsEngine()
 
 GraphicsEngine::~GraphicsEngine()
 {
-	cout << "Destroy Graphics Engine..." << endl;
+	//remove textures from memory
+	TextureStack.clear();
 
 	//this will handle deleting the SDL window from memory
 	SDL_DestroyWindow(SdlWindow);
@@ -23,6 +25,8 @@ GraphicsEngine::~GraphicsEngine()
 	SDL_GL_DeleteContext(SdlGLContext);
 	//close the SDL framework
 	SDL_Quit();
+
+	cout << "Destroyed Graphics Engine..." << endl;
 
 }
 
@@ -167,6 +171,39 @@ void GraphicsEngine::CreateShader(VFShaderParams ShaderFilePaths)
 	//add the shader to our graphics engine
 	Shader = NewShader;
 
+}
+
+TexturePtr GraphicsEngine::CreateTexture(const char* FilePath)
+{
+	TexturePtr NewTexture = nullptr;
+
+	//Run through all the textures and check if one with the same path exists
+	for (TexturePtr TestTexture : TextureStack) {
+		if (TestTexture->GetFilePath() == FilePath) {
+			NewTexture = TestTexture;
+			cout << "Texture found! Assigning current texture." << endl;
+			break;
+		}
+	}
+
+	//if there is no texture already in existence
+	if (NewTexture == nullptr) {
+		cout << "Creating new texture..." << endl;
+
+		//create a new texture already in existence
+		NewTexture = make_shared<Texture>();
+
+		//if the filter was found assign it to the texture stack
+		if (NewTexture->CreateTextureFromFilePath(FilePath)) {
+			cout << "Texture" << NewTexture->GetID() << "creation success! Adding to Texture Stack." << endl;
+			
+			//add the texture to the texture stack
+			TextureStack.push_back(NewTexture);
+		
+		}
+	}
+
+	return NewTexture;
 }
 
 void GraphicsEngine::HandleWireFrameMode(bool bShowWireframeMode)
