@@ -14,7 +14,7 @@ typedef shared_ptr<GraphicsEngine> GraphicsEnginePtr;
 class VertexArrayObject;
 typedef VertexArrayObject VAO;
 typedef shared_ptr<VAO> VAOPtr;
-typedef vector<VAOPtr> VAOStack;
+
 
 class Texture;
 typedef shared_ptr<Texture> TexturePtr;
@@ -23,6 +23,13 @@ typedef vector<TexturePtr> TexturePtrStack;
 
 class ShaderProgram;
 typedef shared_ptr<ShaderProgram> ShaderPtr;
+
+class Mesh;
+typedef shared_ptr<Mesh> MeshPtr;
+typedef vector<MeshPtr> MeshPtrStack;
+
+class Camera;
+typedef shared_ptr<Camera> CameraPtr;
 
 typedef vector<float> PositionMatrix;
 typedef vector<vhsuint> IndicesMatrix;
@@ -39,6 +46,7 @@ enum class GeometricShapes {
 	Triangle = 0,
 	Polygon, 
 	Circle,
+	Cube
 
 };
 

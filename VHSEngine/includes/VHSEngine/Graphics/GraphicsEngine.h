@@ -2,6 +2,7 @@
 
 #include "SDL2/SDL.h"
 #include "VHSEngine/CoreMinimal.h"
+#include "VHSEngine/Mesh/Transformations.h"
 
 class GraphicsEngine {
 public:
@@ -23,24 +24,27 @@ public:
 	SDL_Window* GetWindow() const;
 
 	//add a new VAO to the VAOStack using a shape define
-	void CreateVAO(GeometricShapes Shape);
+	MeshPtr CreateSimpleMeshShape(GeometricShapes Shape, ShaderPtr MeshShader, TexturePtrStack MeshTextures);
 
 	//add new Shader
 	//@param 1 - vertex shader
 	//@param 2 - fragment shader
-	void CreateShader(VFShaderParams ShaderFilePaths);
+	ShaderPtr CreateShader(VFShaderParams ShaderFilePaths);
 
 	//create a texture and add ut to the stack
 	//avoid duplicates
 	TexturePtr CreateTexture(const char* FilePath);
+
+	//Create a texture and add it to the texture pack
+	//screen and camera coordinates
+	void ApplyScreenTransformations(ShaderPtr Shader);
 
 private:
 	//this will hold the window
 	SDL_Window* SdlWindow;
 	//this will allow OpenGL to work with SDL
 	SDL_GLContext SdlGLContext;
-	//stack all the VAOs
-	VAOStack VAOs;
+
 	//handle wireframe mode
 	void HandleWireFrameMode(bool bShowWireframeMode);
 	//set wireframe
@@ -50,5 +54,10 @@ private:
 	ShaderPtr Shader;
 	//store a vector of textures
 	TexturePtrStack TextureStack;
+	//store all meshes in the game
+	MeshPtrStack MeshStack;
 
-};
+public:
+	//default camera
+	CameraPtr EngineDefaultCam;
+};;

@@ -136,19 +136,26 @@
     <ClInclude Include="includes\stb_image\stb_image.h" />
     <ClInclude Include="includes\VHSEngine\CoreMinimal.h" />
     <ClInclude Include="includes\VHSEngine\Game.h" />
+    <ClInclude Include="includes\VHSEngine\Graphics\Camera.h" />
     <ClInclude Include="includes\VHSEngine\Graphics\GraphicsEngine.h" />
     <ClInclude Include="includes\VHSEngine\Graphics\ShaderProgram.h" />
     <ClInclude Include="includes\VHSEngine\Graphics\VertexArrayObject.h" />
     <ClInclude Include="includes\VHSEngine\Graphics\Texture.h" />
+    <ClInclude Include="includes\VHSEngine\Graphics\Mesh.h" />
+    <ClInclude Include="includes\VHSEngine\Input.h" />
+    <ClInclude Include="includes\VHSEngine\Mesh\Transformations.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\Source.cpp" />
+    <ClCompile Include="source\VHSEngine\Graphics\Camera.cpp" />
+    <ClCompile Include="source\VHSEngine\Graphics\Mesh.cpp" />
     <ClCompile Include="source\stb_image\stb_image.cpp" />
     <ClCompile Include="source\VHSEngine\Game.cpp" />
     <ClCompile Include="source\VHSEngine\Graphics\GraphicsEngine.cpp" />
     <ClCompile Include="source\VHSEngine\Graphics\ShaderProgram.cpp" />
     <ClCompile Include="source\VHSEngine\Graphics\Texture.cpp" />
     <ClCompile Include="source\VHSEngine\Graphics\VertexArrayObject.cpp" />
+    <ClCompile Include="source\VHSEngine\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Game\Shaders\TextureShader\TextureShader.sfrag" />

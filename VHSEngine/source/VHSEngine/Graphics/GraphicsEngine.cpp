@@ -1,20 +1,29 @@
 #include "VHSEngine/Graphics/GraphicsEngine.h"
 #include "GL/glew.h"
-#include "VHSEngine/Graphics/VertexArrayObject.h"
+#include "VHSEngine/Graphics/Mesh.h"
 #include "VHSEngine/Graphics/ShaderProgram.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "VHSEngine/Graphics/Texture.h"
+#include "VHSEngine/Graphics/Camera.h"
 
 GraphicsEngine::GraphicsEngine()
 {
 	SdlWindow = nullptr;
 	SdlGLContext = NULL;
 	bWireframeMode = false;
+	//initialise the camera back a bit
+	EngineDefaultCam = make_shared<Camera>();
 }
 
 GraphicsEngine::~GraphicsEngine()
 {
+	//clear the mesh stack
+	MeshStack.clear();
+
+	//clear shader
+	 Shader = nullptr;
+
 	//remove textures from memory
 	TextureStack.clear();
 
@@ -87,6 +96,9 @@ bool GraphicsEngine::InitGE(const char* WTitle, bool bFullScreen, int WWidth, in
 		return false;
 	}
 
+	//enable 3d depth
+	glEnable(GL_DEPTH_TEST);
+
 	return true;
 }
 
@@ -102,7 +114,7 @@ void GraphicsEngine::ClearGraphics()
 	glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
 
 	//clear the screen
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GraphicsEngine::Draw()
@@ -111,38 +123,10 @@ void GraphicsEngine::Draw()
 
 	HandleWireFrameMode(false);
 
-	vhsuint index = 0;
-	for (VAOPtr VAO : VAOs) {
-		
-		Shader->RunShader();
-		
-
-		//move the object
-		glm::mat4 transform = glm::mat4(1.0f);
-
-		if (index == 0) { //Square
-			//move in the x, y or z direction based on the amount added
-			transform = glm::translate(transform, glm::vec3(0.5f, 0.0, 0.0f));
-			//radians is rotating amount
-			//vec3 is the direction to rotate in
-			transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-		}
-		else if (index == 1) { //Triangle
-			transform = glm::translate(transform, glm::vec3(-0.5f, 0.0, 0.0f));
-			//x and y will work for our 2D shapes
-			//z must be larger than 0 or you wont see the object (1 is default)
-			transform = glm::scale(transform, glm::vec3(0.75f, 0.75f, 1.0f));
-		}
-
-		Shader->SetMat4("transform", transform);
-		//draw each VAO
-		VAO->Draw();
-
-		index++;
+	//run through each mesh and call its draw method
+	for (MeshPtr LMesh : MeshStack) {
+		LMesh->Draw();
 	}
-
-	index = 0;
 
 	PresentGraphics();
 }
@@ -152,15 +136,24 @@ SDL_Window* GraphicsEngine::GetWindow() const
 	return SdlWindow;
 }
 
-void GraphicsEngine::CreateVAO(GeometricShapes Shape)
+MeshPtr GraphicsEngine::CreateSimpleMeshShape(GeometricShapes Shape, ShaderPtr MeshShader, TexturePtrStack MeshTextures)
 {
-	// Create a new VAO as a shared pointer
-	VAOPtr NewVAO = make_shared<VAO>(Shape);
-	//add it to the stack
-	VAOs.push_back(NewVAO);
+	//initialise a new mesh class
+	MeshPtr NewMesh = make_shared<Mesh>();
+
+	//make sure the mesh worked
+	if (!NewMesh->CreateSimpleShape(Shape, MeshShader, MeshTextures)) {
+		return nullptr;
+	}
+
+	//add mesh into the stack of meshes to be rendered
+	MeshStack.push_back(NewMesh);
+
+	//return the new mesh
+	return NewMesh;
 }
 
-void GraphicsEngine::CreateShader(VFShaderParams ShaderFilePaths)
+ShaderPtr GraphicsEngine::CreateShader(VFShaderParams ShaderFilePaths)
 {
 	//create a new shader class
 	ShaderPtr NewShader = make_shared<ShaderProgram>();
@@ -171,6 +164,7 @@ void GraphicsEngine::CreateShader(VFShaderParams ShaderFilePaths)
 	//add the shader to our graphics engine
 	Shader = NewShader;
 
+	return NewShader;
 }
 
 TexturePtr GraphicsEngine::CreateTexture(const char* FilePath)
@@ -204,6 +198,32 @@ TexturePtr GraphicsEngine::CreateTexture(const char* FilePath)
 	}
 
 	return NewTexture;
+}
+
+void GraphicsEngine::ApplyScreenTransformations(ShaderPtr Shader)
+{
+	//the angle of the camera planes - basically your zoom
+	float FOV = EngineDefaultCam->GetCameraData().FOV;
+	//find the size of the screen and calculate the aspect ratio
+	int WWidth, WHeight = 0;
+	//use sdl to get the size of the window
+	SDL_GetWindowSize(SdlWindow, &WWidth, &WHeight);
+	//calculate the aspect ratio from the window size
+	float AR = static_cast<float>(WWidth) / static_cast<float>(max(WHeight, 1));
+
+	//create the default coordinatees for the projection and view
+	glm::mat4 view = glm::mat4(1.0f);
+	glm::mat4 projection = glm::mat4(1.0f);
+
+	//update the coordinates for 3d
+	view = EngineDefaultCam->GetViewMatrix();
+	//create the perspective view to allow us to see in 3d
+	//also adjusting the near and far clip
+	projection = glm::perspective(glm::radians(FOV), AR, 
+		EngineDefaultCam->GetCameraData().NearClip, EngineDefaultCam->GetCameraData().FarClip);
+
+	Shader->SetMat4("view", view);
+	Shader->SetMat4("projection", projection);
 }
 
 void GraphicsEngine::HandleWireFrameMode(bool bShowWireframeMode)

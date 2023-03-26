@@ -2,6 +2,8 @@
 #include "VHSEngine/Graphics/GraphicsEngine.h"
 #include "CoreMinimal.h"
 
+class Input;
+
 class Game {
 public:
 	//Get game instance or create one if it doesn't exist
@@ -12,6 +14,19 @@ public:
 
 	//Start the game/app
 	void Start(const char* WTitle, bool bFullscreen, int WWidth, int WHeight);
+	
+	//get precise delta time
+	double GetDeltaTime() { return DeltaTime; }
+	
+	//get less precise delta time
+	float GetFDeltaTime() { return static_cast<float>(DeltaTime); }
+
+	//return the graphics engine
+	GraphicsEnginePtr GetGraphicsEngine() { return Graphics; }
+
+	//set the bIsGameOver to true
+	void CloseApp() { bIsGameOver = true; }
+
 private:
 	Game();
 	~Game();
@@ -37,5 +52,15 @@ private:
 	bool bIsGameOver;
 
 	GraphicsEnginePtr Graphics;
+
+	//the time between each frame
+	double DeltaTime;
+
+	//read the input of the player
+	Input* GameInput;
+
+	//temporary mesh variales
+	MeshPtr Poly2;
+	MeshPtr Poly;
 
 };

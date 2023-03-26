@@ -1,6 +1,8 @@
 #include "VHSEngine/Game.h"
 #include "VHSEngine/Graphics/GraphicsEngine.h"
-#include "VHSEngine/Graphics/Texture.h"
+#include "VHSEngine/Graphics/Mesh.h"
+#include "VHSEngine/Input.h"
+#include "VHSEngine/Graphics/Camera.h"
 
 Game& Game::GetGameInstance()
 {
@@ -31,6 +33,7 @@ Game::Game()
 
 	Graphics = nullptr;
 	bIsGameOver = false;
+	
 }
 
 Game::~Game()
@@ -43,17 +46,24 @@ void Game::Run()
 {
 	if (!bIsGameOver) {
 
-		Graphics->CreateShader({
+		//create an input class to create input
+		GameInput = new Input();
+
+		ShaderPtr TextureShader = Graphics->CreateShader({
 			L"Game/Shaders/TextureShader/TextureShader.svert",
 			L"Game/Shaders/TextureShader/TextureShader.sfrag"
 			});
 
-		Graphics->CreateTexture("Game/Textures/GreySquare_S.jpg");
-		Graphics->CreateTexture("Game/Textures/seamless-tech-texture.jpg")->BindTexture();
+		TexturePtr TConcrete = Graphics->CreateTexture("Game/Textures/GreySquare_S.jpg");
+		TexturePtr TTech = Graphics->CreateTexture("Game/Textures/seamless-tech-texture.jpg");
 
-		//create VAOS
-		Graphics->CreateVAO(GeometricShapes::Polygon);
-		Graphics->CreateVAO(GeometricShapes::Triangle);
+		//create meshes
+		Poly = Graphics->CreateSimpleMeshShape(GeometricShapes::Cube, TextureShader, {TConcrete});
+		Poly2 = Graphics->CreateSimpleMeshShape(GeometricShapes::Cube, TextureShader, { TTech });
+
+
+		Poly->Transform.Location = Vector3(0.0f, 0.0f, 0.0f);
+		Poly2->Transform.Location = Vector3(0.0f, 0.0f, 0.0f);
 	}
 
 	while (!bIsGameOver) {
@@ -73,23 +83,80 @@ void Game::Run()
 
 void Game::Update()
 {
+	//set delta time first always
+	static double LastFrameTime = 0.0;
+	//set the current time since the game has passed
+	double CurrentFrameTime = static_cast<double>(SDL_GetTicks64());
+	// find the time difference between the last and current frame
+	double NewDeltaTime = CurrentFrameTime - LastFrameTime;
+	//set delta time as seconds
+	DeltaTime = NewDeltaTime / 1000.0;
+	//update the last frame time for the next update
+	LastFrameTime = CurrentFrameTime;
+	
+	Poly->Transform.Rotation.x += 50.0f * GetFDeltaTime();
+	Poly->Transform.Rotation.y += 50.0f * GetFDeltaTime();
+	Poly->Transform.Rotation.z += 50.0f * GetFDeltaTime();
+
+	Poly2->Transform.Rotation.x += -50.0f * GetFDeltaTime();
+	Poly2->Transform.Rotation.y += -50.0f * GetFDeltaTime();
+	Poly2->Transform.Rotation.z += -50.0f * GetFDeltaTime();
+
+	Vector3 CameraInput = Vector3(0.0f);
+	CDirections CamDirections = Graphics->EngineDefaultCam->GetDirections();
+
+	//move camera forward
+	if (GameInput->IsKeyDown(SDL_SCANCODE_W)) {
+		CameraInput += CamDirections.Forward;
+	}
+
+	//move camera backward
+	if (GameInput->IsKeyDown(SDL_SCANCODE_S)) {
+		CameraInput += -CamDirections.Forward;
+	}
+
+	//move camera left
+	if (GameInput->IsKeyDown(SDL_SCANCODE_A)) {
+		CameraInput += -CamDirections.Right;
+	}
+
+	//move camera right
+	if (GameInput->IsKeyDown(SDL_SCANCODE_D)) {
+		CameraInput += CamDirections.Right;
+	}
+
+	//move camera up
+	if (GameInput->IsKeyDown(SDL_SCANCODE_Q)) {
+		CameraInput += -CamDirections.Up;
+	}
+
+	//move camera down
+	if (GameInput->IsKeyDown(SDL_SCANCODE_E)) {
+		CameraInput += CamDirections.Up;
+	}
+
+	float CameraSpeed = 1.0f;
+	if (GameInput->IsKeyDown(SDL_SCANCODE_LSHIFT)) {
+		CameraSpeed = 5.0f;
+	}
+	
+
+	CameraInput *= CameraSpeed * GetFDeltaTime();
+
+	Vector3 NewLocation = Graphics->EngineDefaultCam->GetTransform().Location += CameraInput;
+
+	Graphics->EngineDefaultCam->Translate(NewLocation);
+
+	if (GameInput->IsMouseButtonDown(MouseButtons::RIGHT)) {
+		Graphics->EngineDefaultCam->RotatePitch(-GameInput->MouseYDelta * GetFDeltaTime() * 50.0f);
+		Graphics->EngineDefaultCam->RotateYaw(GameInput->MouseXDelta * GetFDeltaTime() * 40.0f);
+	}
 }
 
 void Game::ProcessInput()
 {
-	SDL_Event PollEvent;
-
-	//this is waiting for inputs to be pressed
-	while (SDL_PollEvent(&PollEvent)) {
-		//checking what input was pressed
-		switch (PollEvent.type) {
-		case SDL_QUIT: //on close button pressed
-			bIsGameOver = true;
-			break;
-		default:
-			break;
-		}
-	}
+	//Run the input detection for our game input
+	GameInput->ProcessInput();
 }
 
 void Game::Draw()
@@ -99,4 +166,5 @@ void Game::Draw()
 
 void Game::CloseGame()
 {
+	delete GameInput;
 }
